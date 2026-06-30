@@ -1,13 +1,23 @@
 import "./index.css";
+import "./styles.css";
 
-import logo from "./logo.svg";
+import { Header } from "./components/Header";
+import { Hero } from "./components/Hero";
+import { About } from "./components/About";
+import { Services } from "./components/Services";
+import { Footer } from "./components/Footer";
 
 export function App() {
   return (
-    <div className="bg-red-500 p-4">
-      Hello world!
-      <img src={logo} className="w-12 h-12"/>
-    </div>
+    <>
+      <Header />
+      <main>
+        <Hero />
+        <About />
+        <Services />
+      </main>
+      <Footer />
+    </>
   );
 }
 
