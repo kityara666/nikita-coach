@@ -31,6 +31,22 @@ export function Carousel() {
 
     const project = projects[currentIndex];
 
+    React.useEffect(() => {
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                setIsOpen(false);
+            }
+        };
+
+        if (isOpen) {
+            window.addEventListener('keydown', handleKeyDown);
+        }
+
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [isOpen]);
+
     if (!project) {
         return null;
     }
@@ -64,21 +80,40 @@ export function Carousel() {
 
             {isOpen && (
                 <div className="fixed inset-0 bg-white/90 z-50 flex items-center justify-center">
-                    <div className="relative shadow-2xl p-4 rounded-3xl max-w-5xl w-11/12 bg-white text-center">
-                        <button 
-                            onClick={() => setIsOpen(false)} 
-                            className="absolute top-4 right-5 text-3xl cursor-pointer"
-                        >
-                            Close
-                        </button>
-                        
-                        <img 
-                            src={project.image} 
-                            alt={project.title} 
-                            className="max-w-full h-auto rounded-xl mx-auto mb-4" 
-                        />
-                        <h3 className="text-2xl font-bold mb-2">{project.title}</h3>
-                        <p className="text-lg">{project.fullDesc}</p>
+                    <button 
+                        onClick={() => setIsOpen(false)} 
+                        className="fixed top-6 right-6 text-5xl cursor-pointer hover:text-red-500 transition duration-200"
+                    >
+                        &times;
+                    </button>
+
+                    <div className="relative shadow-2xl p-6 rounded-3xl max-w-4xl w-11/12 bg-white text-center">
+                        <div className="relative flex items-center justify-center px-16">
+                            <button 
+                                onClick={() => setCurrentIndex(currentIndex === 0 ? projects.length - 1 : currentIndex - 1)} 
+                                className="absolute left-0 top-1/2 -translate-y-1/2 flex justify-center items-center text-2xl w-12 h-12 rounded-full bg-gray-200 hover:bg-blue-700 hover:text-white transition duration-200"
+                            >
+                                &lt;
+                            </button>
+
+                            <img 
+                                src={project.image} 
+                                alt={project.title} 
+                                className="max-w-full h-96 object-contain rounded-xl mx-auto" 
+                            />
+
+                            <button 
+                                onClick={() => setCurrentIndex((currentIndex + 1) % projects.length)} 
+                                className="absolute right-0 top-1/2 -translate-y-1/2 flex justify-center items-center text-2xl w-12 h-12 rounded-full bg-gray-200 hover:bg-blue-700 hover:text-white transition duration-200"
+                            >
+                                &gt;
+                            </button>
+                        </div>
+
+                        <div className="mt-4">
+                            <h3 className="text-2xl font-bold mb-2">{project.title}</h3>
+                            <p className="text-lg text-gray-700">{project.fullDesc}</p>
+                        </div>
                     </div>
                 </div>
             )}
