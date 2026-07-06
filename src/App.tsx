@@ -7,6 +7,7 @@ import { About } from "./components/About";
 import { Services } from "./components/Services";
 import { Footer } from "./components/Footer";
 import{Carousel} from "./components/Carousel"; 
+import{ContactForm} from "./components/ContactForm.tsx"
 
 export function App() {
   return (
@@ -16,6 +17,7 @@ export function App() {
         <Hero />
         <About />
         <Services />
+        <ContactForm />
       </main>
       <Carousel />
       <Footer />
