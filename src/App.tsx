@@ -6,7 +6,7 @@ import { Hero } from "./components/Hero";
 import { About } from "./components/About";
 import { Services } from "./components/Services";
 import { Footer } from "./components/Footer";
-import{Carousel} from "./components/Carousel"; 
+import{ProjectCarousel} from "./components/Carousel"; 
 import{ContactForm} from "./components/ContactForm.tsx"
 
 export function App() {
@@ -19,7 +19,7 @@ export function App() {
         <Services />
         <ContactForm />
       </main>
-      <Carousel />
+      <ProjectCarousel />
       <Footer />
     </>
   );

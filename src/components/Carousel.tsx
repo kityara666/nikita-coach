@@ -1,5 +1,12 @@
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
+import { 
+    Carousel, 
+    CarouselContent, 
+    CarouselItem, 
+    CarouselPrevious, 
+    CarouselNext 
+} from "@/components/ui/carousel";
 
 import fencesImg from '../img/Fences.png';
 import plumbingImg from '../img/Plumbing.png';
@@ -26,63 +33,51 @@ const projects = [
     }
 ];
 
-export function Carousel() {
-    const [currentIndex, setCurrentIndex] = useState(0);
-    const [isOpen, setIsOpen] = useState(false);
-
-    const project = projects[currentIndex];
+export function ProjectCarousel() {
+    const [activeProject, setActiveProject] = useState<typeof projects[0] | null>(null);
 
     React.useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
             if (event.key === 'Escape') {
-                setIsOpen(false);
+                setActiveProject(null);
             }
         };
 
-        if (isOpen) {
+        if (activeProject) {
             window.addEventListener('keydown', handleKeyDown);
         }
 
         return () => {
             window.removeEventListener('keydown', handleKeyDown);
         };
-    }, [isOpen]);
-
-    if (!project) {
-        return null;
-    }
+    }, [activeProject]);
 
     return (
-        <div className="flex flex-col items-center">
-            <h2 className="text-3xl font-bold mb-4">{project.title}</h2>
-            
-            <div className="flex items-center justify-center gap-8 w-full max-w-4xl">
-                <Button 
-                    onClick={() => setCurrentIndex(currentIndex === 0 ? projects.length - 1 : currentIndex - 1)} 
-                    variant='outline'
-                >
-                    &lt;
-                </Button>
+        <div className="flex flex-col items-center w-full max-w-4xl mx-auto px-10">
+            <Carousel className="w-full" opts={{ loop: true }}>
+                <CarouselContent>
+                    {projects.map((p) => (
+                        <CarouselItem key={p.title} className="flex flex-col items-center">
+                            <h2 className="text-3xl font-bold mb-4">{p.title}</h2>
+                            <img 
+                                src={p.image} 
+                                alt={p.title} 
+                                onClick={() => setActiveProject(p)}
+                                className="w-full h-96 object-contain object-center cursor-pointer"
+                            />
+                            <p className="mt-2 text-gray-600">{p.shortDesc}</p>
+                        </CarouselItem>
+                    ))}
+                </CarouselContent>
+                
+                <CarouselPrevious />
+                <CarouselNext />
+            </Carousel>
 
-                <img 
-                    src={project.image} 
-                    alt={project.title} 
-                    onClick={() => setIsOpen(true)}
-                    className="w-full h-96 object-contain object-center cursor-pointer"
-                />
-
-                <Button 
-                    onClick={() => setCurrentIndex((currentIndex + 1) % projects.length)} 
-                    variant='outline'
-                >
-                    &gt;
-                </Button>
-            </div>
-
-            {isOpen && (
+            {activeProject && (
                 <div className="fixed inset-0 bg-white/90 z-50 flex items-center justify-center">
                     <Button 
-                        onClick={() => setIsOpen(false)} 
+                        onClick={() => setActiveProject(null)} 
                         variant='ghost'
                         size="lg" 
                         className="absolute right-2 top-2"
@@ -92,30 +87,16 @@ export function Carousel() {
 
                     <div className="relative shadow-2xl p-6 rounded-3xl max-w-4xl w-11/12 bg-white text-center">
                         <div className="relative flex items-center justify-center px-16">
-                            <Button 
-                                onClick={() => setCurrentIndex(currentIndex === 0 ? projects.length - 1 : currentIndex - 1)} 
-                                variant='outline'
-                            >
-                                &lt;
-                            </Button>
-
                             <img 
-                                src={project.image} 
-                                alt={project.title} 
+                                src={activeProject.image} 
+                                alt={activeProject.title} 
                                 className="max-w-full h-96 object-contain rounded-xl mx-auto" 
                             />
-
-                            <Button 
-                                onClick={() => setCurrentIndex((currentIndex + 1) % projects.length)} 
-                                variant='outline'
-                            >
-                                &gt;
-                            </Button>
                         </div>
 
                         <div className="mt-4">
-                            <h3 className="text-2xl font-bold mb-2">{project.title}</h3>
-                            <p className="text-lg text-gray-700">{project.fullDesc}</p>
+                            <h3 className="text-2xl font-bold mb-2">{activeProject.title}</h3>
+                            <p className="text-lg text-gray-700">{activeProject.fullDesc}</p>
                         </div>
                     </div>
                 </div>
