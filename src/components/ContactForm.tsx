@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Button } from "@/components/ui/button";
 
 export function ContactForm() {
     const [name, setName] = useState("");
@@ -36,7 +37,7 @@ export function ContactForm() {
         <label>Message:<textarea value={message} onChange={(e) => setMessage(e.target.value)} className="border rounded p-2 w-full"/></label>
         {error.message && <p className="text-red-500">{error.message}</p>}
         
-        <button type='submit' className="bg-transparent border-2 border-blue-700 rounded-2xl p-5 transition duration-200 text-blue-700 hover:bg-blue-700 hover:text-white">Submit</button>
+        <Button type='submit' variant="outline">Submit</Button>
 
         {success && <p className="text-green-500">{success}</p>}
     </form>

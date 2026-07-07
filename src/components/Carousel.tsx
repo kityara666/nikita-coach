@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Button } from "@/components/ui/button";
 
 import fencesImg from '../img/Fences.png';
 import plumbingImg from '../img/Plumbing.png';
@@ -56,12 +57,12 @@ export function Carousel() {
             <h2 className="text-3xl font-bold mb-4">{project.title}</h2>
             
             <div className="flex items-center justify-center gap-8 w-full max-w-4xl">
-                <button 
+                <Button 
                     onClick={() => setCurrentIndex(currentIndex === 0 ? projects.length - 1 : currentIndex - 1)} 
-                    className="flex justify-center items-center text-2xl w-12 h-12 rounded-full bg-gray-200 hover:bg-blue-700 hover:text-white transition duration-200"
+                    variant='outline'
                 >
                     &lt;
-                </button>
+                </Button>
 
                 <img 
                     src={project.image} 
@@ -70,31 +71,33 @@ export function Carousel() {
                     className="w-full h-96 object-contain object-center cursor-pointer"
                 />
 
-                <button 
+                <Button 
                     onClick={() => setCurrentIndex((currentIndex + 1) % projects.length)} 
-                    className="flex justify-center items-center text-2xl w-12 h-12 rounded-full bg-gray-200 hover:bg-blue-700 hover:text-white transition duration-200"
+                    variant='outline'
                 >
                     &gt;
-                </button>
+                </Button>
             </div>
 
             {isOpen && (
                 <div className="fixed inset-0 bg-white/90 z-50 flex items-center justify-center">
-                    <button 
+                    <Button 
                         onClick={() => setIsOpen(false)} 
-                        className="fixed top-6 right-6 text-5xl cursor-pointer hover:text-red-500 transition duration-200"
+                        variant='ghost'
+                        size="lg" 
+                        className="absolute right-2 top-2"
                     >
                         &times;
-                    </button>
+                    </Button>
 
                     <div className="relative shadow-2xl p-6 rounded-3xl max-w-4xl w-11/12 bg-white text-center">
                         <div className="relative flex items-center justify-center px-16">
-                            <button 
+                            <Button 
                                 onClick={() => setCurrentIndex(currentIndex === 0 ? projects.length - 1 : currentIndex - 1)} 
-                                className="absolute left-0 top-1/2 -translate-y-1/2 flex justify-center items-center text-2xl w-12 h-12 rounded-full bg-gray-200 hover:bg-blue-700 hover:text-white transition duration-200"
+                                variant='outline'
                             >
                                 &lt;
-                            </button>
+                            </Button>
 
                             <img 
                                 src={project.image} 
@@ -102,12 +105,12 @@ export function Carousel() {
                                 className="max-w-full h-96 object-contain rounded-xl mx-auto" 
                             />
 
-                            <button 
+                            <Button 
                                 onClick={() => setCurrentIndex((currentIndex + 1) % projects.length)} 
-                                className="absolute right-0 top-1/2 -translate-y-1/2 flex justify-center items-center text-2xl w-12 h-12 rounded-full bg-gray-200 hover:bg-blue-700 hover:text-white transition duration-200"
+                                variant='outline'
                             >
                                 &gt;
-                            </button>
+                            </Button>
                         </div>
 
                         <div className="mt-4">
