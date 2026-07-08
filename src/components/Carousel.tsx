@@ -8,28 +8,28 @@ import {
     CarouselNext 
 } from "@/components/ui/carousel";
 
-import fencesImg from '../img/Fences.png';
-import plumbingImg from '../img/Plumbing.png';
-import remodelingImg from '../img/Remodeling.png';
+import noobaccount from '../img/mega-noob-account.png';
+import mediumaccount from '../img/noob-account.png';
+import bossaccount from '../img/boss-account.png';
 
 const projects = [
     {
-        title: "Fences",
-        shortDesc: "Wood fence installation.",
-        fullDesc: "Complete replacement of the old fence with high-quality cedar.",
-        image: fencesImg
+        title: "Before Coaching (Herald - Guardian)",
+        shortDesc: "Macro-game chaos and low win rate.",
+        fullDesc: "Profile with around a 45% win rate. Random hero pool, lost lanes, lack of understanding of personal mistakes, and zero map control throughout the game.",
+        image: noobaccount
     },
     {
-        title: "Plumbing",
-        shortDesc: "Leak repair and faucet swap.",
-        fullDesc: "Fixed a leaky pipe under the kitchen sink and installed a new faucet.",
-        image: plumbingImg
+        title: "Progress (Archon - Ancient)",
+        shortDesc: "Confident laning and solid hero pool.",
+        fullDesc: "Win rate increased to 55%+. Built a reliable pool of 3-4 signature heroes. Perfected the laning stage, creep aggro, farming timings, and positioning in team fights.",
+        image: mediumaccount
     },
     {
-        title: "Bathroom & Kitchen Remodeling",
-        shortDesc: "Modern updates for your kitchen and bathroom spaces.",
-        fullDesc: "We handle all cosmetic and structural updates, including tile installation, cabinet mounting, new light fixtures, and plumbing hookups. From minor refreshing to complete transformations.",
-        image: remodelingImg
+        title: "Result (Immortal)",
+        shortDesc: "Reaching the high-MMR bracket.",
+        fullDesc: "Consistent gameplay with high impact in every match. Deep understanding of drafts, win conditions, and macro movements. The coveted Immortal rank has been achieved!",
+        image: bossaccount
     }
 ];
 
@@ -58,14 +58,14 @@ export function ProjectCarousel() {
                 <CarouselContent>
                     {projects.map((p) => (
                         <CarouselItem key={p.title} className="flex flex-col items-center">
-                            <h2 className="text-3xl font-bold mb-4">{p.title}</h2>
+                            <h2 className="text-3xl font-bold mb-4 text-violet-400">{p.title}</h2>
                             <img 
                                 src={p.image} 
                                 alt={p.title} 
                                 onClick={() => setActiveProject(p)}
                                 className="w-full h-96 object-contain object-center cursor-pointer"
                             />
-                            <p className="mt-2 text-gray-600">{p.shortDesc}</p>
+                            <p className="mt-2 text-violent-600">{p.shortDesc}</p>
                         </CarouselItem>
                     ))}
                 </CarouselContent>
@@ -75,7 +75,7 @@ export function ProjectCarousel() {
             </Carousel>
 
             {activeProject && (
-                <div className="fixed inset-0 bg-white/90 z-50 flex items-center justify-center">
+                <div className="fixed inset-0 bg-zinc-950/90 z-50 flex items-center justify-center">
                     <Button 
                         onClick={() => setActiveProject(null)} 
                         variant='ghost'
@@ -85,7 +85,7 @@ export function ProjectCarousel() {
                         &times;
                     </Button>
 
-                    <div className="relative shadow-2xl p-6 rounded-3xl max-w-4xl w-11/12 bg-white text-center">
+                    <div className="relative shadow-2xl p-6 rounded-3xl max-w-4xl w-11/12 bg-zinc-900 text-center">
                         <div className="relative flex items-center justify-center px-16">
                             <img 
                                 src={activeProject.image} 
@@ -95,8 +95,8 @@ export function ProjectCarousel() {
                         </div>
 
                         <div className="mt-4">
-                            <h3 className="text-2xl font-bold mb-2">{activeProject.title}</h3>
-                            <p className="text-lg text-gray-700">{activeProject.fullDesc}</p>
+                            <h3 className="text-2xl font-bold mb-2 text-violet-400">{activeProject.title}</h3>
+                            <p className="text-lg">{activeProject.fullDesc}</p>
                         </div>
                     </div>
                 </div>

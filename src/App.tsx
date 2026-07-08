@@ -1,6 +1,7 @@
 import "./index.css";
 import "./styles.css";
 
+
 import { Header } from "./components/Header";
 import { Hero } from "./components/Hero";
 import { About } from "./components/About";
@@ -12,6 +13,7 @@ import{ContactForm} from "./components/ContactForm.tsx"
 export function App() {
   return (
     <>
+    <div className="min-h-screen bg-zinc-950 text-zinc-100">
       <Header />
       <main>
         <Hero />
@@ -21,6 +23,7 @@ export function App() {
       </main>
       <ProjectCarousel />
       <Footer />
+    </div>
     </>
   );
 }
