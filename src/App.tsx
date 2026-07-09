@@ -10,6 +10,7 @@ import { Footer } from "./components/Footer";
 import{ProjectCarousel} from "./components/Carousel"; 
 import{ContactForm} from "./components/ContactForm.tsx"
 import{Pricing} from "./components/Pricing.tsx"
+import{Reviews} from "./components/Reviews.tsx"
 
 export function App() {
   return (
@@ -24,6 +25,7 @@ export function App() {
       </main>
       <ProjectCarousel />
       <Pricing />
+      <Reviews />
       <Footer />
     </div>
     </>
