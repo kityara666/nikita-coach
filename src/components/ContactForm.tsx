@@ -8,9 +8,9 @@ import { Card } from "@/components/ui/card";
 export function ContactForm() {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
-    const [idaccount, setIdaccount] = useState("");
+    const [tgaccount, setTgaccount] = useState("");
     const [message, setMessage] = useState("");
-    const [error, setError] = useState<{ name?: string; email?: string; message?: string; idaccount?: string;}>({});
+    const [error, setError] = useState<{ name?: string; email?: string; message?: string; tgaccount?: string;}>({});
     const [success, setSuccess] = useState("");
 
     function handleSubmit(e: React.FormEvent) {
@@ -19,7 +19,7 @@ export function ContactForm() {
         setSuccess("");
         let localErrors: any = {};
         if (name === "") { localErrors.name = "Name is required"; }
-        if (idaccount === "") { localErrors.idaccount = "ID is required"; }
+        if (tgaccount === "") { localErrors.idaccount = "ID is required"; }
         if (!email.includes('@')) { localErrors.email = "There is no @!"; }
         if (message.length < 10) { localErrors.message = "Text too short!"; }
         if (Object.keys(localErrors).length > 0) { setError(localErrors); }
@@ -40,9 +40,9 @@ export function ContactForm() {
                     </div>
 
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="idaccount">ID:</Label>
-                        <Input id="idaccount" value={idaccount} onChange={(e) => setIdaccount(e.target.value)} />
-                        {error.idaccount && <p className="text-red-500 text-sm">{error.idaccount}</p>}
+                        <Label htmlFor="tgaccount">Telegram:</Label>
+                        <Input id="tgaccount" value={tgaccount} onChange={(e) => setTgaccount(e.target.value)} />
+                        {error.tgaccount && <p className="text-red-500 text-sm">{error.tgaccount}</p>}
                     </div>
                     
                     <div className="flex flex-col gap-2">

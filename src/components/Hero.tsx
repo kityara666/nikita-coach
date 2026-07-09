@@ -10,7 +10,7 @@ export function Hero() {
       <p className="text-2xl font-light leading-relaxed text-zinc-300 max-w-2xl">
         Immortal-rank Dota 2 coach — <span className="text-violet-400 font-medium">climb the ranks with me.</span>
       </p>
-      <a href="#projects-carousel" className="mt-4 no-underline text-zinc-50 transition-all duration-200 bg-violet-600 rounded-full border-2 border-solid border-violet-600 py-4 px-8 inline-block hover:bg-violet-700 hover:border-violet-700 font-medium">
+      <a href="#" className="mt-4 no-underline text-zinc-50 transition-all duration-200 bg-violet-600 rounded-full border-2 border-solid border-violet-600 py-4 px-8 inline-block hover:bg-violet-700 hover:border-violet-700 font-medium">
         See Gameplay
       </a>
     </section>

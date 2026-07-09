@@ -9,6 +9,7 @@ import { Services } from "./components/Services";
 import { Footer } from "./components/Footer";
 import{ProjectCarousel} from "./components/Carousel"; 
 import{ContactForm} from "./components/ContactForm.tsx"
+import{Pricing} from "./components/Pricing.tsx"
 
 export function App() {
   return (
@@ -22,6 +23,7 @@ export function App() {
         <ContactForm />
       </main>
       <ProjectCarousel />
+      <Pricing />
       <Footer />
     </div>
     </>
