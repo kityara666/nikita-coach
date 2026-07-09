@@ -9,7 +9,7 @@ const reviews = [
 export function Reviews() {
   return (
     <section className="py-24 px-4 max-w-6xl mx-auto" id="reviews">
-      <h2 className="text-3xl font-bold mb-12 text-center text-zinc-50">Rewiews</h2>
+      <h2 className="text-3xl font-bold mb-12 text-center text-zinc-50">Reviews</h2>
       
       <div className="grid gap-6 md:grid-cols-3">
         
