@@ -13,7 +13,7 @@ export function ContactForm() {
     const [error, setError] = useState<{ name?: string; email?: string; message?: string; tgaccount?: string;}>({});
     const [success, setSuccess] = useState("");
 
-    function handleSubmit(e: React.FormEvent) {
+    async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         setError({});
         setSuccess("");
@@ -24,8 +24,16 @@ export function ContactForm() {
         if (message.length < 10) { localErrors.message = "Text too short!"; }
         if (Object.keys(localErrors).length > 0) { setError(localErrors); }
         if (Object.keys(localErrors).length === 0) {
+            const response = await fetch('/api/contact',{
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({ name, tgaccount, email, message })
+            });
+            if (response.ok){
             setSuccess("Success!");
-            setName(""); setEmail(""); setMessage("");
+            setName(""); setEmail(""); setMessage("");setTgaccount("");
+            }
+            else{console.error('Error');}
         }
     }
 
