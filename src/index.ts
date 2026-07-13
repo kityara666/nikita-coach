@@ -1,13 +1,7 @@
 import { serve } from "bun";
 import index from "./index.html";
-import { appendFile } from "node:fs/promises";
-import { existsSync } from "node:fs";
 
-function escapeCSV(text: string) {
-  const str = String(text);
-  const safeStr = str.replaceAll('"', '""');
-  return `"${safeStr}"`;
-}
+const DB_FILE = "submissions.json";
 
 const server = serve({
 
@@ -24,40 +18,50 @@ const server = serve({
       },
     },
 
-    "/api/hello/:name": async req => {
+    "/api/hello/:name":{
+      async GET(req) {
       const name = req.params.name;
       return Response.json({ message: `Hello, ${name}!` });
     },
+  },
 
-    "/api/contact": {
-      async POST(req) {
-        const body = await req.json();
+"/api/contact": {
+      async POST(req: Request) {
+        try {
+          const body = await req.json();
 
-        const name = body.name || "";
-        const tgaccount = body.tgaccount || "";
-        const email = body.email || "";
-        const message = body.message || "";
+          const newSubmission = {
+            ...body,
+            createdAt: new Date().toISOString(),
+          };
 
-        if (
-          name === "" ||
-          tgaccount === "" ||
-          email === "" ||
-          !email.includes('@') ||
-          message.length < 10
-        ) {
-          return Response.json({ error: "Bad request. Invalid data." }, { status: 400 });
+          let submissions = [];
+          const file = Bun.file(DB_FILE);
+
+          if (await file.exists()) {
+            const text = await file.text();
+            if (text.trim() !== "") {
+              submissions = JSON.parse(text);
+            }
+          }
+
+          submissions.push(newSubmission);
+
+          await Bun.write(DB_FILE, JSON.stringify(submissions, null, 2));
+
+          return Response.json({ success: true, message: "Submission saved" });
+
+        } catch (error) {
+          console.error("Failed to save submission:", error);
+          
+          return new Response(
+            JSON.stringify({ error: "Failed to process submission due to a server error." }), 
+            { 
+              status: 500, 
+              headers: { "Content-Type": "application/json" } 
+            }
+          );
         }
-
-        console.log("The data has been verified:", { name, tgaccount, email, message });
-
-        const filePath = "submissions.csv";
-        if (!existsSync(filePath)) {
-          await appendFile(filePath, "Name,Telegram,Email,Message\n");
-        }
-        const newRow = `${escapeCSV(name)},${escapeCSV(tgaccount)},${escapeCSV(email)},${escapeCSV(message)}\n`;
-        await appendFile(filePath, newRow);
-
-        return Response.json({ success: true, message: "The form reached the server!" });
       }
     },
 

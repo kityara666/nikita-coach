@@ -12,18 +12,21 @@ export function ContactForm() {
     const [message, setMessage] = useState("");
     const [error, setError] = useState<{ name?: string; email?: string; message?: string; tgaccount?: string;}>({});
     const [success, setSuccess] = useState("");
+    const [serverError, setServerError] = useState("");
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         setError({});
         setSuccess("");
+        setServerError("");
         let localErrors: any = {};
         if (name === "") { localErrors.name = "Name is required"; }
-        if (tgaccount === "") { localErrors.idaccount = "ID is required"; }
+        if (tgaccount === "") { localErrors.tgaccount = "Telegram is required"; }
         if (!email.includes('@')) { localErrors.email = "There is no @!"; }
         if (message.length < 10) { localErrors.message = "Text too short!"; }
         if (Object.keys(localErrors).length > 0) { setError(localErrors); }
         if (Object.keys(localErrors).length === 0) {
+            try {
             const response = await fetch('/api/contact',{
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
@@ -32,11 +35,15 @@ export function ContactForm() {
             if (response.ok){
             setSuccess("Success!");
             setName(""); setEmail(""); setMessage("");setTgaccount("");
-            }
-            else{console.error('Error');}
+            } else {
+                const errorData: any = await response.json().catch(() => ({})); 
+                setServerError(errorData.error || "Internal Server Error.");
+        } 
+        } catch (err) {
+            setServerError("Can't connect to server")
         }
     }
-
+    }
     return (
             <Card className="max-w-md mx-auto w-full my-8">
                 <form onSubmit={handleSubmit} className="flex flex-col gap-4 p-6">
@@ -68,6 +75,7 @@ export function ContactForm() {
                     <Button type="submit" variant="outline" className="mt-2">Submit</Button>
 
                     {success && <p className="text-green-500 text-center">{success}</p>}
+                    {serverError && <p className="text-red-500 text-center">{serverError}</p>}
                 </form>
             </Card>
         );
