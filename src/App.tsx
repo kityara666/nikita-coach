@@ -11,8 +11,10 @@ import{ProjectCarousel} from "./components/Carousel";
 import{ContactForm} from "./components/ContactForm.tsx"
 import{Pricing} from "./components/Pricing.tsx"
 import{Reviews} from "./components/Reviews.tsx"
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { SubmissionsPage } from "./components/SubmissionsPage.tsx";
 
-export function App() {
+function HomePage() {
   return (
     <>
     <div className="min-h-screen bg-zinc-950 text-zinc-100">
@@ -30,6 +32,19 @@ export function App() {
     </div>
     </>
   );
+}
+
+export function App() {
+  return (
+  <BrowserRouter>
+    <Routes>
+      <Route>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/submissions" element={<SubmissionsPage />} />
+      </Route>
+    </Routes>
+  </BrowserRouter>
+  )
 }
 
 export default App;

@@ -2,6 +2,16 @@ import { serve } from "bun";
 import index from "./index.html";
 
 const DB_FILE = "submissions.json";
+async function getSubmissionsData() {
+  const file = Bun.file(DB_FILE);
+  if (await file.exists()) {
+    const text = await file.text();
+    if (text.trim() !== "") {
+      return JSON.parse(text);
+    }
+  }
+  return [];
+}
 
 const server = serve({
 
@@ -35,15 +45,7 @@ const server = serve({
             createdAt: new Date().toISOString(),
           };
 
-          let submissions = [];
-          const file = Bun.file(DB_FILE);
-
-          if (await file.exists()) {
-            const text = await file.text();
-            if (text.trim() !== "") {
-              submissions = JSON.parse(text);
-            }
-          }
+          let submissions = await getSubmissionsData();
 
           submissions.push(newSubmission);
 
@@ -60,6 +62,21 @@ const server = serve({
               status: 500, 
               headers: { "Content-Type": "application/json" } 
             }
+          );
+        }
+      }
+    },
+
+    "/api/submissions": {
+      async GET() {
+        try {
+          const data = await getSubmissionsData();
+          return Response.json(data);
+        } catch (error) {
+          console.error("Failed to read submissions:", error);
+          return new Response(
+            JSON.stringify({ error: "Failed to read data" }), 
+            { status: 500, headers: { "Content-Type": "application/json" } }
           );
         }
       }
