@@ -13,6 +13,7 @@ import{Pricing} from "./components/Pricing.tsx"
 import{Reviews} from "./components/Reviews.tsx"
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { SubmissionsPage } from "./components/SubmissionsPage.tsx";
+import {LoginPage} from "./components/LoginPage.tsx"
 
 function HomePage() {
   return (
@@ -41,6 +42,7 @@ export function App() {
       <Route>
         <Route path="/" element={<HomePage />} />
         <Route path="/submissions" element={<SubmissionsPage />} />
+        <Route path="/login" element={<LoginPage />} />
       </Route>
     </Routes>
   </BrowserRouter>

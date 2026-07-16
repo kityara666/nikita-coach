@@ -1,22 +1,24 @@
 import { Card } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 export function SubmissionsPage() {
     const [submissions, setSubmissions] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState("");
-
+    const navigate = useNavigate();
 
     useEffect(() => {
         async function fetchData() {
                     try {
                         const response = await fetch('/api/submissions');
                         
-                        if (!response.ok) {
-                            throw new Error("Error");
+                        if (response.status === 401) {
+                        navigate("/login");
+                        return;
                         }
-                        
+
                         const data = await response.json();
                         
                         setSubmissions(data);
@@ -29,7 +31,7 @@ export function SubmissionsPage() {
                     
                 }
                 fetchData();
-    }, []);
+    }, [navigate]);
 
     return (
         <div>

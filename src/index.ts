@@ -68,8 +68,17 @@ const server = serve({
     },
 
     "/api/submissions": {
-      async GET() {
+      async GET(req) {
         try {
+          const userId = req.cookies.get("user_id");
+
+          if (!userId) {
+            return Response.json(
+              { error: "Unauthorized" }, 
+              { status: 401 }
+            );
+          }
+
           const data = await getSubmissionsData();
           return Response.json(data);
         } catch (error) {
@@ -82,7 +91,41 @@ const server = serve({
       }
     },
 
+    "/api/login": {
+      async POST(req) {
+        try {
+        const body = await req.json();
+        const users_file = "users.json"
+        const users_data  = Bun.file(users_file);
+        const users = await users_data.text();
+        const usersArray = JSON.parse(users);
+        const matchedUser = usersArray.find((user:any) => user.username === body.username && user.password === body.password);
+        if (!matchedUser) {
+          return Response.json(
+            { error: "Invalid username or password" }, 
+            { status: 401 }
+          );
+        }
+        req.cookies.set("user_id", matchedUser.id, {
+          httpOnly: true,
+          sameSite: "lax",
+          path: "/",
+          maxAge: 60 * 60,
+        });
+        return Response.json(
+          {success:"Success"},
+          {status:200}
+        )
+        } catch(error) {console.error("Login error:", error);
+        return new Response(
+          JSON.stringify({ error: "Server error during login" }), 
+          { status: 500 }
+        );
+        }
+      }
   },
+},
+  
 
   development: process.env.NODE_ENV !== "production" && {
     hmr: true,
