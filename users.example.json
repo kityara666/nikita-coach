@@ -2,6 +2,6 @@
   {
     "id": "1",
     "username": "Admin",
-    "password": "password-here"
+    "passwordHash": "password-here"
   }
 ]

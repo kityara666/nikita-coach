@@ -83,7 +83,7 @@ const server = serve({
           const users_data = await users_file.text();
           const usersArray = JSON.parse(users_data);
           
-          const userExists = usersArray.find((u: any) => u.id === userId);
+          const userExists = usersArray.find((u: any) => String(u.id) === String(userId));
           if (!userExists) {
              return Response.json({ error: "Invalid session" }, { status: 401 });
           }
@@ -108,13 +108,23 @@ const server = serve({
         const users_data  = Bun.file(users_file);
         const users = await users_data.text();
         const usersArray = JSON.parse(users);
-        const matchedUser = usersArray.find((user:any) => user.username === body.username && user.password === body.password);
+        const matchedUser = usersArray.find((user:any) => user.username === body.username);
         if (!matchedUser) {
           return Response.json(
             { error: "Invalid username or password" }, 
             { status: 401 }
           );
         }
+
+        const isPasswordValid = await Bun.password.verify(body.password, matchedUser.passwordHash);
+
+        if (!isPasswordValid) {
+          return Response.json(
+            { error: "Invalid username or password" }, 
+            { status: 401 }
+          );
+        }
+        
         req.cookies.set("user_id", matchedUser.id, {
           httpOnly: true,
           sameSite: "lax",
