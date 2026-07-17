@@ -2,12 +2,17 @@ import { Card } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 export function SubmissionsPage() {
     const [submissions, setSubmissions] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState("");
     const navigate = useNavigate();
+    const handleLogout = async () => {
+    await fetch("/api/logout", { method: "POST" });
+    navigate("/login");
+    };
 
     useEffect(() => {
         async function fetchData() {
@@ -36,6 +41,7 @@ export function SubmissionsPage() {
     return (
         <div>
             <Link to="/">Home</Link>
+            <Button onClick={handleLogout} variant="outline" className="mb-6">Logout</Button>
             <h1 className="text-3xl font-bold mb-6">List</h1>
             {submissions.map((submission, index) => (
             <Card key={index} className="mb-4 p-4">

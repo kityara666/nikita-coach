@@ -79,6 +79,15 @@ const server = serve({
             );
           }
 
+          const users_file = Bun.file("users.json");
+          const users_data = await users_file.text();
+          const usersArray = JSON.parse(users_data);
+          
+          const userExists = usersArray.find((u: any) => u.id === userId);
+          if (!userExists) {
+             return Response.json({ error: "Invalid session" }, { status: 401 });
+          }
+
           const data = await getSubmissionsData();
           return Response.json(data);
         } catch (error) {
@@ -124,6 +133,13 @@ const server = serve({
         }
       }
   },
+
+  "/api/logout": {
+      async POST(req) {
+        req.cookies.delete("user_id");
+        return Response.json({ success: "Logged out" });
+      }
+    },
 },
   
 
