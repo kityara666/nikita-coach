@@ -1,20 +1,8 @@
+import { db } from "./database.ts";
 import { serve } from "bun";
 import index from "./index.html";
 import {createCipheriv,  createDecipheriv,  randomBytes,} from "node:crypto";
 import { create } from "node:domain";
-
-const DB_FILE = "submissions.json";
-async function getSubmissionsData() {
-  const file = Bun.file(DB_FILE);
-  if (await file.exists()) {
-    const text = await file.text();
-    if (text.trim() !== "") {
-      return JSON.parse(text);
-    }
-  }
-  return [];
-}
-
 
 const secretString = process.env.SESSION_COOKIE_KEY;
 
@@ -113,16 +101,18 @@ const server = serve({
         try {
           const body = await req.json();
 
-          const newSubmission = {
-            ...body,
-            createdAt: new Date().toISOString(),
-          };
+          const insert = db.query(`
+            INSERT INTO submissions (name, telegram, email, message, createdAt) 
+            VALUES ($name, $telegram, $email, $message, $createdAt)
+          `);
 
-          let submissions = await getSubmissionsData();
-
-          submissions.push(newSubmission);
-
-          await Bun.write(DB_FILE, JSON.stringify(submissions, null, 2));
+          insert.run({
+            $name: body.name,
+            $telegram: body.tgaccount || null,
+            $email: body.email || null,
+            $message: body.message,
+            $createdAt: new Date().toISOString()
+          });
 
           return Response.json({ success: true, message: "Submission saved" });
 
@@ -157,16 +147,26 @@ const server = serve({
           return Response.json({ error: "Invalid session or token expired" }, { status: 401 });
           }
 
-          const users_file = Bun.file("users.json");
-          const users_data = await users_file.text();
-          const usersArray = JSON.parse(users_data);
-          
-          const userExists = usersArray.find((u: any) => String(u.id) === String(decryptedUserId));
+          const userExists = db.query(`
+            SELECT id FROM users WHERE id = $id
+          `).get({
+            $id: decryptedUserId
+          });
           if (!userExists) {
              return Response.json({ error: "Invalid session" }, { status: 401 });
           }
 
-          const data = await getSubmissionsData();
+          const data = db.query(`
+            SELECT 
+              id, 
+              name, 
+              telegram AS tgaccount, 
+              email, 
+              message, 
+              createdAt 
+            FROM submissions 
+            ORDER BY createdAt DESC
+          `).all();
           return Response.json(data);
         } catch (error) {
           console.error("Failed to read submissions:", error);
@@ -182,11 +182,11 @@ const server = serve({
       async POST(req) {
         try {
         const body = await req.json();
-        const users_file = "users.json"
-        const users_data  = Bun.file(users_file);
-        const users = await users_data.text();
-        const usersArray = JSON.parse(users);
-        const matchedUser = usersArray.find((user:any) => user.username === body.username);
+        const matchedUser = db.query(`
+          SELECT * FROM users WHERE username = $username
+        `).get({
+          $username: body.username
+        }) as any;
         if (!matchedUser) {
           return Response.json(
             { error: "Invalid username or password" }, 

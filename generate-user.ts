@@ -1,17 +1,30 @@
-const username = prompt("Enter new username: ");
-const password = prompt("Enter new password: ");
+import { db } from "./src/database.ts";
 
-if (username && password) {
-  const passwordHash = await Bun.password.hash(password);
-  
-  const newUser = {
-    id: 1,
-    username: username,
-    passwordHash: passwordHash
-  };
-  
-  console.log("\ Готово! Скопируй этот массив и вставь его в свой users.json:\n");
-  console.log(JSON.stringify([newUser], null, 2));
-} else {
-  console.log("Ошибка: логин и пароль обязательны.");
+const username = "admin";
+const plainPassword = "password123";
+
+async function seedUser() {
+  try {
+    const hash = await Bun.password.hash(plainPassword);
+
+    db.query(`
+      INSERT INTO users (username, passwordHash, createdAt)
+      VALUES ($username, $passwordHash, $createdAt)
+    `).run({
+      $username: username,
+      $passwordHash: hash,
+      $createdAt: new Date().toISOString()
+    });
+
+    console.log(`User "${username}" successfully added to the database!`);
+    
+  } catch (error: any) {
+    if (error.message.includes("UNIQUE constraint failed")) {
+      console.error(`Error: User with username "${username}" already exists.`);
+    } else {
+      console.error("An error occurred while creating the user:", error);
+    }
+  }
 }
+
+seedUser();

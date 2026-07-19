@@ -38,3 +38,8 @@ submissions.json
 users.json
 
 .env
+
+# SQLite database
+data.sqlite
+data.sqlite-wal
+data.sqlite-shm
