@@ -1,3 +1,5 @@
+import { syncHeroes } from "./heroes.ts";
+
 interface Profile {
   personaname: string;
 }
@@ -19,14 +21,15 @@ interface TotalsEntry {
 async function main() {
 
 const command = Bun.argv[2];
+
+if(command==="analyze-account"){
+
 const accountId = Bun.argv[3];
 
 const id = Number(accountId);   
 const isValid = !Number.isNaN(id) && Number.isInteger(id) && id>0;
 
-const commandValid = command === "analyze-account"
-
-if (!isValid || !commandValid) {
+if (!isValid) {
   console.error("Usage: bun run ./src/cli.ts analyze-account <account-id>");
   process.exit(1);
 }
@@ -92,20 +95,61 @@ if (totalGames === 0) {
 }
 
 console.log(`
-Account: ${id}
-Nickname: ${nickname}
-Wins: ${wins}
-Losses: ${losses}
-Win rate: ${winRate}%
-Kills: ${killsEntrySum}
-Assists: ${assistsEntrySum}
-Deaths: ${deathsEntrySum}
+Account:${id}
+Nickname:${nickname}
+Wins:${wins}
+Losses:${losses}
+Win rate:${winRate}%
+Kills:${killsEntrySum}
+Assists:${assistsEntrySum}
+Deaths:${deathsEntrySum}
 `);
 } catch(error){
     console.error("Failed to fetch or parse data from OpenDota");
     console.error(error);
     process.exit(1);
 }
-};
+} else if (command ==="sync-heroes") {
+        await syncHeroes();
+        process.exit(0);
+}
+else if (command === "schedule-heroes") {
+    console.log("Starting scheduled heroes sync worker");
+
+    process.on("SIGINT", () => {
+    console.log("Shutting down heroes sync worker");
+    process.exit(0);
+  });
+
+    let isSyncing = false;
+
+    async function runOnce() {
+    if (isSyncing) {
+        console.log("Sync already running, skipping this tick");
+        return;
+    }
+    isSyncing = true;
+    try {
+        await syncHeroes();
+    } finally {
+        isSyncing = false;
+    }
+    }
+
+    await runOnce();
+
+    Bun.cron("* */4 * * *", async () => {
+    await runOnce();
+    });
+
+}
+else {
+  console.error("Unknown command. Available: analyze-account, sync-heroes, schedule-heroes");
+  process.exit(1);
+}
+
+
+}
+
 
 main();

@@ -25,4 +25,24 @@ db.run(`
 
 `)
 
+db.run(`
+  CREATE TABLE IF NOT EXISTS heroes(
+  id  INTEGER PRIMARY KEY,
+  name TEXT NOT NULL,
+  localized_name TEXT NOT NULL,
+  primary_attr TEXT NOT NULL,
+  attack_type TEXT NOT NULL,
+  last_synced TEXT NOT NULL
+  )
+`)
+
+db.run(`
+  CREATE TABLE IF NOT EXISTS hero_roles(
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  hero_id INTEGER NOT NULL,
+  role TEXT NOT NULL,
+  FOREIGN KEY (hero_id) REFERENCES heroes(id)
+  )
+`)
+
 console.log("Data base connected!");

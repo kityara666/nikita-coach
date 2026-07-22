@@ -14,6 +14,7 @@ import{Reviews} from "./components/Reviews.tsx"
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { SubmissionsPage } from "./components/SubmissionsPage.tsx";
 import {LoginPage} from "./components/LoginPage.tsx"
+import {HeroesPage} from "./components/HeroesPage.tsx"
 
 function HomePage() {
   return (
@@ -43,6 +44,7 @@ export function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/submissions" element={<SubmissionsPage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/heroes" element={<HeroesPage />} />
       </Route>
     </Routes>
   </BrowserRouter>

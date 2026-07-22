@@ -11,6 +11,7 @@ export function Header() {
         <a href="#" className="no-underline text-violet-400 text-base md:text-xl inline-block py-2 px-4 md:py-2 md:px-5 bg-transparent rounded-full border-2 border-solid border-violet-600 transition-all duration-200 hover:bg-violet-600 hover:text-white">Home</a>
         <a href="#service" className="no-underline text-violet-400 text-base md:text-xl inline-block py-2 px-4 md:py-2 md:px-5 bg-transparent rounded-full border-2 border-solid border-violet-600 transition-all duration-200 hover:bg-violet-600 hover:text-white">Services</a>
         <a href="#contact" className="no-underline text-violet-400 text-base md:text-xl inline-block py-2 px-4 md:py-2 md:px-5 bg-transparent rounded-full border-2 border-solid border-violet-600 transition-all duration-200 hover:bg-violet-600 hover:text-white">Contact</a>
+        <a href="http://localhost:3000/heroes" className="no-underline text-violet-400 text-base md:text-xl inline-block py-2 px-4 md:py-2 md:px-5 bg-transparent rounded-full border-2 border-solid border-violet-600 transition-all duration-200 hover:bg-violet-600 hover:text-white">Heroes</a>
       </nav>
     </header>
   );

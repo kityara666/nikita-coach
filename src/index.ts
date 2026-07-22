@@ -2,7 +2,6 @@ import { db } from "./database.ts";
 import { serve } from "bun";
 import index from "./index.html";
 import {createCipheriv,  createDecipheriv,  randomBytes,} from "node:crypto";
-import { create } from "node:domain";
 
 const secretString = process.env.SESSION_COOKIE_KEY;
 
@@ -224,11 +223,46 @@ const server = serve({
   },
 
   "/api/logout": {
-      async POST(req) {
-        req.cookies.delete("user_id");
-        return Response.json({ success: "Logged out" });
+    async POST(req) {
+      req.cookies.delete("user_id");
+      return Response.json({ success: "Logged out" });
+    }
+  },
+
+  "/api/heroes": {
+    async GET() {
+      try {
+        const heroes = db.query(`
+          SELECT id, name, localized_name, primary_attr, attack_type, last_synced
+          FROM heroes
+          ORDER BY localized_name ASC
+        `).all();
+
+        const roleQuery = db.query(`SELECT role FROM hero_roles WHERE hero_id = $hero_id`);
+
+        const heroesWithRoles = heroes.map((hero: any) => {
+          const roleRows = roleQuery.all({ $hero_id: hero.id }) as { role: string }[];
+          const roles = roleRows.map((r) => r.role);
+          return { ...hero, roles };
+        });
+
+        const lastSyncedRow = db.query(`SELECT MAX(last_synced) AS lastSynced FROM heroes`).get() as { lastSynced: string | null };
+        const lastSynced = lastSyncedRow.lastSynced;
+
+        return Response.json({
+          heroes: heroesWithRoles,
+          lastSynced: lastSynced,
+        });
+      } catch (error) {
+        console.error("Failed to read heroes:", error);
+        return new Response(
+          JSON.stringify({ error: "Failed to read heroes" }),
+          { status: 500, headers: { "Content-Type": "application/json" } }
+        );
       }
-    },
+    }
+  },
+
 },
   
 
