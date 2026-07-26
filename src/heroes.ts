@@ -1,5 +1,9 @@
 import { db } from "./database";
 
+// Bun cron schedules run in UTC.
+// "0 */4 * * *" → minute 0 of every 4th hour: 00:00, 04:00, 08:00, 12:00, 16:00, 20:00 UTC.
+export const HEROES_SYNC_CRON = "0 */4 * * *";
+
 interface Hero {
   id: number;
   name: string;

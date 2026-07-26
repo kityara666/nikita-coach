@@ -1,5 +1,6 @@
-import { syncHeroes } from "./heroes.ts";
 import { importMatches } from "./matches.ts";
+import { syncHeroes, HEROES_SYNC_CRON } from "./heroes.ts";
+
 
 interface Profile {
   personaname: string;
@@ -18,6 +19,7 @@ interface TotalsEntry {
   field: string;
   sum: number;
 }
+
 
 async function main() {
 
@@ -143,10 +145,9 @@ else if (command === "schedule-heroes") {
 
     await runOnce();
 
-    Bun.cron("0 */4 * * *", async () => {
-    await runOnce();
-    });
-
+Bun.cron(HEROES_SYNC_CRON, async () => {
+  await runOnce();
+});
 }
 else {
   console.error("Unknown command. Available: analyze-account, sync-heroes, schedule-heroes");
