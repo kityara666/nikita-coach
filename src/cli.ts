@@ -1,4 +1,5 @@
 import { syncHeroes } from "./heroes.ts";
+import { importMatches } from "./matches.ts";
 
 interface Profile {
   personaname: string;
@@ -34,7 +35,11 @@ if (!isValid) {
   process.exit(1);
 }
 
+
+
 try{
+const imported = await importMatches(id);
+console.log(`Match history: ${imported} new matches imported`);
 const profilePromise = fetch(`https://api.opendota.com/api/players/${id}`);
 const wlPromise = fetch(`https://api.opendota.com/api/players/${id}/wl`);
 const totalsPromise = fetch(`https://api.opendota.com/api/players/${id}/totals`);
@@ -138,7 +143,7 @@ else if (command === "schedule-heroes") {
 
     await runOnce();
 
-    Bun.cron("* */4 * * *", async () => {
+    Bun.cron("0 */4 * * *", async () => {
     await runOnce();
     });
 

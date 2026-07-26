@@ -50,7 +50,7 @@ const insertRole = db.query(`
 `);
 
 const runSync = db.transaction((heroesArray: Hero[]) => {
-  const now = new Date().toISOString();
+  const now = Date.now();
   for (const hero of heroesArray) {
     upsertHero.run({
         $id: hero.id,

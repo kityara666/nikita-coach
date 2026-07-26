@@ -13,7 +13,7 @@ async function seedUser() {
     `).run({
       $username: username,
       $passwordHash: hash,
-      $createdAt: new Date().toISOString()
+      $createdAt: Date.now()
     });
 
     console.log(`User "${username}" successfully added to the database!`);

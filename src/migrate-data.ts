@@ -29,7 +29,7 @@ async function migrate() {
       insertUser.run({
         $username: user.username,
         $passwordHash: user.passwordHash,
-        $createdAt: user.createdAt || new Date().toISOString()
+        $createdAt: user.createdAt ? new Date(user.createdAt).getTime() : Date.now()
       });
     }
 
@@ -39,7 +39,7 @@ async function migrate() {
         $telegram: sub.telegram || sub.tgaccount || null,
         $email: sub.email || null,
         $message: sub.message,
-        $createdAt: sub.createdAt || new Date().toISOString()
+        $createdAt: sub.createdAt ? new Date(sub.createdAt).getTime() : Date.now()
       });
     }
   });

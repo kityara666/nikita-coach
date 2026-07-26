@@ -1,4 +1,10 @@
 import { db } from "./database.ts";
-   db.run("DELETE FROM hero_roles");
-   db.run("DELETE FROM heroes");
-   console.log("Cleared");
+
+const shared = db.query(`
+  SELECT match_id, COUNT(*) AS accounts
+  FROM matches
+  GROUP BY match_id
+  HAVING COUNT(*) > 1
+  LIMIT 5
+`).all();
+console.log("Shared matches:", shared);

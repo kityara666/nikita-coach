@@ -110,7 +110,7 @@ const server = serve({
             $telegram: body.tgaccount || null,
             $email: body.email || null,
             $message: body.message,
-            $createdAt: new Date().toISOString()
+            $createdAt: Date.now()
           });
 
           return Response.json({ success: true, message: "Submission saved" });
