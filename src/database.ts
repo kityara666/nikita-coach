@@ -71,4 +71,8 @@ db.run(`
   )
   `)
 
+db.run(`
+  CREATE INDEX IF NOT EXISTS idx_matches_account_time
+  ON matches (account_id, start_time);`)
+
 console.log("Data base connected!");

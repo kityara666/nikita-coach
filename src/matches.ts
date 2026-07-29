@@ -1,5 +1,6 @@
 import { db } from "./database.ts";
 
+
 export function getResult(playerSlot: number, radiantWin: boolean): "win" | "loss" {
   const isRadiant = playerSlot < 128;
     if (isRadiant === radiantWin) {
@@ -102,6 +103,17 @@ const newestStoredId = row ? (row as any).match_id : null;
   return collected;
 }
 
+export function hasAnyMatches(accountId: number,database=db): boolean {
+  const row = database.query(`
+    SELECT 1
+    FROM matches
+    WHERE account_id = $accountId
+    LIMIT 1
+  `).get({ $accountId: accountId });
+
+  return row !== null;
+}
+
 export function insertMatches(matches: any[], accountId: number) {
   const insertMatch = db.query(`
     INSERT INTO matches (
@@ -130,4 +142,25 @@ export async function importMatches(accountId: number): Promise<number> {
   const collected = await fetchAllNewMatches(accountId);
   const count = insertMatches(collected, accountId);
   return count;
+}
+
+export function getTopHeroes(accountId: number, days: number, database=db) {
+  const cutoff = Math.floor(Date.now() / 1000) - days * 24 * 60 * 60;
+
+  const rows = database.query(`
+    SELECT
+      matches.hero_id,
+      heroes.localized_name,
+      COUNT(*) AS games,
+      SUM(CASE WHEN matches.result = 'win' THEN 1 ELSE 0 END) AS wins
+    FROM matches
+    LEFT JOIN heroes ON heroes.id = matches.hero_id
+    WHERE matches.account_id = $accountId
+      AND matches.start_time >= $cutoff
+    GROUP BY matches.hero_id
+    ORDER BY wins DESC, games DESC, heroes.localized_name ASC
+    LIMIT 10
+  `).all({ $accountId: accountId, $cutoff: cutoff });
+
+  return rows;
 }

@@ -1,6 +1,5 @@
-import { importMatches } from "./matches.ts";
 import { syncHeroes, HEROES_SYNC_CRON } from "./heroes.ts";
-
+import { importMatches, getTopHeroes, hasAnyMatches } from "./matches.ts";
 
 interface Profile {
   personaname: string;
@@ -128,6 +127,8 @@ else if (command === "schedule-heroes") {
     process.exit(0);
   });
 
+  
+
     let isSyncing = false;
 
     async function runOnce() {
@@ -149,6 +150,46 @@ Bun.cron(HEROES_SYNC_CRON, async () => {
   await runOnce();
 });
 }
+
+else if (command === "top-heroes") {
+  const accountId = Bun.argv[3];
+  const daysArg = Bun.argv[4];
+
+  const id = Number(accountId);
+  const days = Number(daysArg);
+  const allowedDays = [7, 30, 60, 90, 160, 365];
+
+  const idValid = !Number.isNaN(id) && Number.isInteger(id) && id > 0;
+  const daysValid = allowedDays.includes(days);
+
+  if (!idValid || !daysValid) {
+    console.error("Usage: bun run ./src/cli.ts top-heroes <account-id> <7|30|60|90|160|365>");
+    process.exit(1);
+  }
+
+const topHeroes = getTopHeroes(id, days);
+
+if (topHeroes.length === 0) {
+  if (!hasAnyMatches(id)) {
+    console.error(`No match history for account ${id}. Run: bun run ./src/cli.ts analyze-account ${id}`);
+    process.exit(1);
+  } else {
+    console.log(`No matches in the last ${days} days for account ${id}.`);
+    process.exit(0);
+  }
+}
+
+console.log(`\nTop heroes for account ${id} — last ${days} days\n`);
+
+topHeroes.forEach((hero: any, index: number) => {
+  const name = hero.localized_name ?? `Unknown hero (${hero.hero_id})`;
+  const winRate = (hero.wins / hero.games * 100).toFixed(2);
+  const losses = hero.games - hero.wins;
+  console.log(`${index + 1}. ${name} — ${hero.wins} wins / ${losses} losses / ${hero.games} games (${winRate}%)`);
+});
+
+}
+
 else {
   console.error("Unknown command. Available: analyze-account, sync-heroes, schedule-heroes");
   process.exit(1);

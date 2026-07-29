@@ -82,4 +82,6 @@ console.log(`Synced ${heroes.length} heroes`);
     console.error("Failed to fetch or parse heroes:",error);
     return;
 }
+
+
 }
