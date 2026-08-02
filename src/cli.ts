@@ -1,5 +1,6 @@
 import { syncHeroes, HEROES_SYNC_CRON } from "./heroes.ts";
 import { importMatches, getTopHeroes, hasAnyMatches } from "./matches.ts";
+import { upsertAccount } from "./accounts.ts";
 
 interface Profile {
   personaname: string;
@@ -75,6 +76,9 @@ if (!profileData.profile) {
 
 
 const nickname = profileData.profile.personaname;
+
+upsertAccount(id, nickname, null);
+
 const wins = wlData.win;
 const losses = wlData.lose;
 const killsEntry = totalsData.find((item) => item.field === "kills");

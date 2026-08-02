@@ -2,6 +2,7 @@ import { db } from "./database.ts";
 import { serve } from "bun";
 import index from "./index.html";
 import {createCipheriv,  createDecipheriv,  randomBytes,} from "node:crypto";
+import { getAccountsSummary, getAccount, getAccountPeriodSummary, getAccountMatches } from "./accounts.ts";
 
 const secretString = process.env.SESSION_COOKIE_KEY;
 
@@ -263,8 +264,97 @@ const server = serve({
     }
   },
 
+  "/api/accounts": {
+  async GET() {
+    try {
+      const accounts = getAccountsSummary();
+
+      const result = accounts.map((acc: any) => {
+        const games = acc.games ?? 0;
+        const wins = acc.wins ?? 0;
+        const losses = games - wins;
+        const winRate = games > 0 ? (wins / games * 100).toFixed(2) : "0.00";
+
+        return {
+          account_id: acc.account_id,
+          nickname: acc.nickname,
+          avatar: acc.avatar,
+          cached_wins: wins,
+          cached_losses: losses,
+          cached_games: games,
+          cached_win_rate: winRate,
+          last_analysed: acc.last_analysed,
+          latest_match: acc.latest_match,
+        };
+      });
+
+      return Response.json({ accounts: result });
+    } catch (error) {
+      console.error("Failed to read accounts:", error);
+      return new Response(
+        JSON.stringify({ error: "Failed to read accounts" }),
+        { status: 500, headers: { "Content-Type": "application/json" } }
+      );
+    }
+  }
 },
-  
+
+
+"/api/accounts/:accountId/matches": {
+  async GET(req) {
+    try {
+      
+      const accountId = Number(req.params.accountId);
+
+      
+      const url = new URL(req.url);
+      const daysParam = url.searchParams.get("days");
+      const days = daysParam === null ? 30 : Number(daysParam);
+
+      
+      if (!Number.isInteger(accountId) || accountId <= 0) {
+        return Response.json({ error: "Invalid account id" }, { status: 400 });
+      }
+
+      
+      const allowedDays = [7, 30, 60, 90, 160, 365];
+      if (!allowedDays.includes(days)) {
+        return Response.json({ error: "Invalid days" }, { status: 400 });
+      }
+
+   
+      const account = getAccount(accountId) as any;
+      if (!account) {
+        return Response.json({ error: "Account not analyzed" }, { status: 404 });
+      }
+
+     
+      const summary = getAccountPeriodSummary(accountId, days) as any;
+      const matches = getAccountMatches(accountId, days) as any[];
+
+      const games = summary.games ?? 0;
+      const wins = summary.wins ?? 0;
+      const losses = games - wins;
+      const winRate = games > 0 ? (wins / games * 100).toFixed(2) : "0.00";
+
+      return Response.json({
+        account,
+        days,
+        summary: { wins, losses, games, win_rate: winRate },
+        matches,
+      });
+    } catch (error) {
+      console.error("Failed to read account matches:", error);
+      return Response.json({ error: "Failed to read account matches" }, { status: 500 });
+    }
+  }
+},
+
+},
+
+
+
+
 
   development: process.env.NODE_ENV !== "production" && {
     hmr: true,

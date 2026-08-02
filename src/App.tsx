@@ -15,6 +15,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { SubmissionsPage } from "./components/SubmissionsPage.tsx";
 import {LoginPage} from "./components/LoginPage.tsx"
 import {HeroesPage} from "./components/HeroesPage.tsx"
+import { AccountsPage } from "./components/AccountsPage.tsx";
+import { AccountDetailPage } from "./components/AccountDetailPage.tsx";
 
 function HomePage() {
   return (
@@ -45,6 +47,8 @@ export function App() {
         <Route path="/submissions" element={<SubmissionsPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/heroes" element={<HeroesPage />} />
+        <Route path="/accounts" element={<AccountsPage />} />
+        <Route path="/accounts/:accountId" element={<AccountDetailPage />} />
       </Route>
     </Routes>
   </BrowserRouter>

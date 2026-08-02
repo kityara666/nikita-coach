@@ -75,4 +75,13 @@ db.run(`
   CREATE INDEX IF NOT EXISTS idx_matches_account_time
   ON matches (account_id, start_time);`)
 
+db.run(`
+  CREATE TABLE IF NOT EXISTS analyzed_accounts(
+  account_id INTEGER PRIMARY KEY,
+  nickname TEXT NOT NULL,
+  avatar TEXT,
+  last_analysed INTEGER NOT NULL
+  )
+  `)
+
 console.log("Data base connected!");
