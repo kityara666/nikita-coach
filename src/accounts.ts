@@ -84,3 +84,30 @@ export function getAccount(accountId: number) {
     WHERE account_id = $accountId
   `).get({ $accountId: accountId });
 }
+
+export function getHeroAggregates(accountId: number, days: number, database = db) {
+  const cutoff = Math.floor(Date.now() / 1000) - days * 24 * 60 * 60;
+
+  const rows = database.query(`
+    SELECT
+      matches.hero_id,
+      heroes.localized_name,
+      COUNT(*) AS games,
+      SUM(CASE WHEN matches.result = 'win' THEN 1 ELSE 0 END) AS wins,
+      SUM(matches.kills) AS total_kills,
+      SUM(matches.deaths) AS total_deaths,
+      SUM(matches.assists) AS total_assists,
+      SUM(CASE WHEN matches.result = 'win' THEN matches.kills ELSE 0 END) AS win_kills,
+      SUM(CASE WHEN matches.result = 'win' THEN matches.deaths ELSE 0 END) AS win_deaths,
+      SUM(CASE WHEN matches.result = 'win' THEN matches.assists ELSE 0 END) AS win_assists,
+      SUM(CASE WHEN matches.result = 'win' AND matches.duration > 600 THEN 1 ELSE 0 END) AS fast_win_count,
+      SUM(CASE WHEN matches.result = 'win' AND matches.duration > 600 THEN matches.duration ELSE 0 END) AS fast_win_duration_sum
+    FROM matches
+    LEFT JOIN heroes ON heroes.id = matches.hero_id
+    WHERE matches.account_id = $accountId
+      AND matches.start_time >= $cutoff
+    GROUP BY matches.hero_id
+  `).all({ $accountId: accountId, $cutoff: cutoff });
+
+  return rows;
+}

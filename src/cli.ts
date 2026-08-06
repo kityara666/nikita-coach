@@ -1,6 +1,8 @@
 import { syncHeroes, HEROES_SYNC_CRON } from "./heroes.ts";
 import { importMatches, getTopHeroes, hasAnyMatches } from "./matches.ts";
-import { upsertAccount } from "./accounts.ts";
+import { upsertAccount, getAccount, getAccountPeriodSummary } from "./accounts.ts";
+import { rankHeroPool, formatDuration } from "./heropool.ts";
+
 
 interface Profile {
   personaname: string;
@@ -191,6 +193,96 @@ topHeroes.forEach((hero: any, index: number) => {
   const losses = hero.games - hero.wins;
   console.log(`${index + 1}. ${name} — ${hero.wins} wins / ${losses} losses / ${hero.games} games (${winRate}%)`);
 });
+
+}
+
+else if (command === "best-hero-pool") {
+  const accountId = Bun.argv[3];
+  const daysArg = Bun.argv[4];
+
+  const id = Number(accountId);
+  const idValid = !Number.isNaN(id) && Number.isInteger(id) && id > 0;
+
+
+  const days = daysArg === undefined ? 180 : Number(daysArg);
+  const daysValid = Number.isInteger(days) && days >= 1 && days <= 730;
+
+  if (!idValid || !daysValid) {
+    console.error("Usage: bun run ./src/cli.ts best-hero-pool <account-id> [days: 1-730, default: 180]");
+    process.exit(1);
+  }
+
+
+  const account = getAccount(id) as any;
+  if (!account) {
+    console.error(`Account ${id} has not been analyzed. Run: bun run ./src/cli.ts analyze-account ${id}`);
+    process.exit(1);
+  }
+
+
+  if (!hasAnyMatches(id)) {
+    console.error(`No match history for account ${id}. Run: bun run ./src/cli.ts analyze-account ${id}`);
+    process.exit(1);
+  }
+
+  const ranked = rankHeroPool(id, days) as any[];
+  const summary = getAccountPeriodSummary(id, days) as any;
+
+  const eligibleCount = ranked.length;
+
+  const sGames = summary.games ?? 0;
+  const sWins = summary.wins ?? 0;
+  const sLosses = sGames - sWins;
+  const sWinRate = sGames > 0 ? (sWins / sGames * 100).toFixed(2) : "0.00";
+
+  console.log(`\nBest hero pool for ${account.nickname} (${id}) — last ${days} days`);
+  console.log(`Cached: ${sGames} games · ${sWins}W / ${sLosses}L · ${sWinRate}% WR · ${eligibleCount} eligible heroes\n`);
+
+  function printLeaderboard(title: string, sortFn: (a: any, b: any) => number, format: (h: any) => string) {
+    console.log(title);
+    const top = [...ranked].sort(sortFn).slice(0, 5);
+    top.forEach((h, i) => {
+      console.log(`  ${i + 1}. ${h.localized_name} — ${format(h)}`);
+    });
+    console.log("");
+  }
+
+  printLeaderboard(
+    "Fastest winning heroes (>10 min)",
+    (a, b) => (a.avgFastWinDuration ?? Infinity) - (b.avgFastWinDuration ?? Infinity),
+    (h) => h.avgFastWinDuration !== null ? `${formatDuration(h.avgFastWinDuration)} avg (${h.fastWinCount} wins)` : "N/A"
+  );
+
+  printLeaderboard(
+    "Overall KDA",
+    (a, b) => b.overallKda - a.overallKda,
+    (h) => `${h.overallKda.toFixed(2)} KDA`
+  );
+
+  printLeaderboard(
+    "KDA in wins",
+    (a, b) => (b.winKda ?? -Infinity) - (a.winKda ?? -Infinity),
+    (h) => h.winKda !== null ? `${h.winKda.toFixed(2)} KDA` : "N/A"
+  );
+
+  printLeaderboard(
+    "Hero win rate",
+    (a, b) => b.winRate - a.winRate,
+    (h) => `${h.winRate.toFixed(2)}%`
+  );
+
+  console.log("Recommended hero pool\n");
+  const pool = ranked.slice(0, 5);
+  pool.forEach((h, i) => {
+    const winKdaStr = h.winKda !== null ? `${h.winKda.toFixed(2)} win KDA` : "N/A win KDA";
+    const speedStr = h.avgFastWinDuration !== null ? `${formatDuration(h.avgFastWinDuration)} avg winning time (${h.fastWinCount})` : "N/A winning time";
+    console.log(`${i + 1}. ${h.localized_name} — score ${h.score}`);
+    console.log(`   ${h.wins}W / ${h.losses}L · ${h.winRate.toFixed(2)}% WR · ${h.overallKda.toFixed(2)} KDA · ${winKdaStr} · ${speedStr}`);
+  });
+
+  if (eligibleCount < 5) {
+    console.log(`\nWarning: only ${eligibleCount} eligible heroes — need more match history for a full five-hero pool.`);
+  }
 
 }
 
